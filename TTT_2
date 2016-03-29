@@ -170,12 +170,3 @@ b.play
 # >>    7 | 8 | 9
 # >> Pick a free spot
 
-# !> TERM environment variable not set.
-# !> TERM environment variable not set.
-
-# ~> NoMethodError
-# ~> undefined method `chomp' for nil:NilClass
-# ~>
-# ~> /Users/jeffng/Desktop/odin_project/ruby/intermediate_ruby/Project_OOP/project_1_TTT/TTT_Mar_22_2016.rb:93:in `intake_move'
-# ~> /Users/jeffng/Desktop/odin_project/ruby/intermediate_ruby/Project_OOP/project_1_TTT/TTT_Mar_22_2016.rb:135:in `play'
-# ~> /Users/jeffng/Desktop/odin_project/ruby/intermediate_ruby/Project_OOP/project_1_TTT/TTT_Mar_22_2016.rb:159:in `<main>'
