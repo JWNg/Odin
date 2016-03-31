@@ -1,6 +1,5 @@
 #Pregame options:
 # => number of guesses (default -> 12)
-# => number of letters to guess (default -> 6)
 # => number of games to play in total 
 # => code maker or code breaker role
 #===========================================================
@@ -18,65 +17,126 @@
 # 
 require 'pry'
 
-module Codemaker
-  attr_accessor :mystery_code      
-end
-
-module Codebreaker
-  def guess
-  end
-end
 
 class Players
-  attr_accessor :score, :role
+  attr_accessor :score, :role, :mystery_code
   
   def initialize
     @score = Fixnum.new(0)
+    @mystery_code = Array.new
   end  
-end
-
-class combos
-  attr_accessor :code
   
-  def initialize(entry)
-    :code = Array.new(entry)
+  def guess
   end
-end
-
-class feedback_from_guess
-  attr_accessor :feedback
   
-  def initialize(entry)
-    :feedback = Array.new(entry)
-  end
-end
+$#end
+$#
+$#class combos
+$#  attr_accessor :code
+$#  
+$#  def initialize(entry)
+$#    :code = Array.new(entry)
+$#  end
+$#
+$#  def feedback_from_guess(guess)
+$#    feedback = Array.new
+$#    guess.each do |letter| 
+$#      if letter ==   
+$#  end
+$#end
 
 class Board
   def initialize
-    :feedback_container = {}
-    #iterate up to number of guesses that was taken from start of game
+    :feedback_container = Array.new
+    :combo_container = Array.new
+    #(1..@guesses).each{\x\ @feedback_container = feedback_from_guess.new}
+    #(1..@guesses).each{\x\ @guess_container = combos.new}
+    #Array of arrays
+    #iterate up to number of guesses that was taken from start of game, default 12
+    :mystery_code = Combos.new
+    :turn = 0
   end
     
   def update_board
-  end
-  
-  def provide_feedback
-  end
+    system 'clear'
+    puts " GUESSES   =>   FEEDBACK "
+    puts " _ _ _ _   =>   _ _ _ _  ##{@turn+1}" * Game.@guesses
+  end 
   
   def accept_guesses
+    begin
+      puts "please input a guess!"
+      split = Array.new
+      guess = gets.chomp.upcase!
+      if guess.size != 4 
+        puts "you must put in 4 letters from A-F"
+        retry
+      if guess.each_char{|letter| true unless letter =~ (/[ABCDEF]/)}
+        puts "All your guesses must be from A-F"
+        retry
+      else
+        split = guess.split(//)
+        @combo_container[@turn] = split
+      end
+    end        
   end
   
-  def update_display
-  end
-
   def accept_mystery_code
+    holder = String.new 
+    i = 0    
+    puts "Please input the mystery code!"
+    until i >3
+      until @mystery_code[i] =~ (/[ABCDEF]/)
+        puts "Which letter(A-F) would you like to put in position#{i+1}?"
+        holder = gets.chomp.upcase! # => NoMethodError: undefined method `chomp' for nil:NilClass
+        @mystery_code[i]= holder[0]
+        puts "please put a letter from A-F" unless @mystery_code[i] =~ (/[ABCDEF]/)    
+      end
+      i += 1 if @mystery_code[i] != 'x'
+    end
   end
 end
 
 class Game
+  attr_accessor :rounds, :guesses
+  def initialize
+    @rounds = 0
+    @guesses = 0
+    @board = Board.new
+  end
+  
+  def start
+    until @rounds > 0 # => false
+      puts "Welcome to Mastermind, How many rounds would you like in this game?" 
+      @rounds = gets.chomp.to_i # ~> NoMethodError: undefined method `chomp' for nil:NilClass
+      puts"please input a number(ie. 1)" if @rounds == 0
+    end
+    until @guesses > 0 # => false
+      puts "How many guesses would you like in this game?" 
+      @guesses = gets.chomp.to_i # ~> NoMethodError: undefined method `chomp' for nil:NilClass
+      puts"please input a number(ie. 1)" if @guesses == 0
+    end
+  end
+      
+  def game   
+    start
+    @board.accept_myster_code
+    
+    
+  end
+    
+  #loop through # of rounds(set at start of the game)
+  #for i in 1..n # n is the number of rounds
+    #codemaker sets code 
+    #loop through the guesses done by the codebreaker for n times (default 12, set at start)
+    #end
 end
 
   
+
+
+
+
 
 
 
