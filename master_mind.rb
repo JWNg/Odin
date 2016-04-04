@@ -1,20 +1,3 @@
-#Pregame options:
-# => number of guesses (default -> 12)
-# => number of games to play in total 
-# => code maker or code breaker role
-#===========================================================
-##
-#objects:
-#=> players (score)
-#=> board (update_board, display ongoing score, display games left/played, make code, assess correctness, provide feedback) 
-#=> game
-#=> combos (4 spots)
-#Modules:
-#-codemaker ( )
-#-codebreaker (make guess)
-#===========================================================
-# 
-# 
 require 'pry'
 
 
@@ -31,29 +14,32 @@ class Players
   
 end
 
-class Combos
-  attr_accessor :code
-  
-  def initialize
-    @code = Array.new(4, " _ ")
-  end
-
-  #def feedback_from_guess(guess)
-  #  feedback = Array.new
-  #  guess.each do |letter| 
-  #    if letter ==   
-  #end
-end
+#class Combos
+#  attr_accessor :code
+#  
+#  def initialize
+#    @code = Array.new(4, " _ ")
+#  end
+#
+#  #def feedback_from_guess(guess)
+#  #  feedback = Array.new
+#  #  guess.each do |letter| 
+#  #    if letter ==   
+#  #end
+#end
 
 class Board
+  attr_accessor :guesses, :turn, :feedback_container, :combo_container
+  
   def initialize    
-    @mystery_code = Combos.new
+    @mystery_code = Array.new(4, " _ ")
     @turn = 0
-    @guesses = Fixnum
-    @feedback_container = Array.new
-    @combo_container = Array.new
-    (0..@guesses-1).each{|x| @feedback_container[x] = Combos.new}
-    (0..@guesses-1).each{|x| @combo_container[x] = Combos.new}
+    @guesses = 0
+    @feedback_container = Array.new(@guesses, [])
+    @combo_container = Array.new(@guesses, [])
+    #(0..@guesses-1).each{|x| @feedback_container[x] = Array.new(4, " _ ")}
+    #(0..@guesses-1).each{|x| @combo_container[x] = Array.new(4, " _ ")}
+    #binding.pry
     #Array of arrays
     #iterate up to number of guesses that was taken from start of game, default 12
   end
@@ -64,35 +50,81 @@ class Board
     begin
       puts "please input a combination in the following format (ie. 'ABCD')"
       string = gets.chomp.upcase
-      puts "That was not an appropriate input, please try again" unless string =~ /[a-fA-F]{4}/             
-    end until string =~ /[a-fA-F]{4}/
+      puts "That was not an appropriate input, please try again" unless string =~ /[a-fA-F]{4}/ && string.size == 4             
+    end until string =~ /[a-fA-F]{4}/ && string.size == 4
     combination = string.split(//)    
   end
     
   def feedback(i)
-    difference = @mystery_code - @combo_container[i] #if you get back 4 objects, that means none were right, if you get back 1 object, that means 3 was right
-    number_of_correct_letters = 4 - difference.size 
-    number_of_black = 0
-    (0..3).each do |number|
-      number_of_black += 1 if @mystery_code[number] == @combo_container[i][number]
+    black_markers = 0
+    #temp_guess = Array.new
+    #temp_mystery_code = Array.new
+    temp_guess = @combo_container[i].dup
+    temp_mystery_code = @mystery_code.dup
+    puts temp_guess
+    puts temp_mystery_code
+    (0..3).each do |position|
+      if temp_guess[position] == temp_mystery_code[position] 
+        if temp_guess[position] == 'X'
+          next
+        else
+          black_markers +=1
+          temp_guess[position] = 'X'
+          temp_mystery_code[position] = 'X' 
+        end
+      #else
+      #  next
+      end
     end
-    number_of_white = number_of_correct_letters - number_of_black
+    binding.pry
+    white_markers = 0
+    temp_guess.each do|guess|
+      if temp_mystery_code.include?(guess)
+        white_markers += 1 unless guess == "X"
+        index = temp_mystery_code.index(guess)
+        temp_mystery_code.slice!(index)
+      end
+    end    
     feedback = Array.new
-    number_of_black.times do
+    black_markers.times do
       feedback << " B "
     end
-    number_of_white.times do
+    white_markers.times do
+      #binding.pry
       feedback << " W "
     end
-    @feedback_container[i] = feedback 
+    @feedback_container[i] = feedback      
+      
+        
+    
+    #difference = @combo_container[i]- @mystery_code  #if you get back 4 objects, that means none were right, if you get back 1 object, that means 3 was right
+    ##binding.pry
+    #number_of_correct_letters = 4- difference.size 
+    #number_of_black = 0
+    #(0..3).each do |number|
+    #  number_of_black += 1 if @mystery_code[number] == @combo_container[i][number]
+    #end
+    #binding.pry
+    #number_of_white = number_of_correct_letters - number_of_black
+    #feedback = Array.new
+    #number_of_black.times do
+    #  feedback << " B "
+    #end
+    #number_of_white.times do
+    #  #binding.pry
+    #  feedback << " W "
+    #end
+    #@feedback_container[i] = feedback 
   end  
     
   def update_board
     system 'clear'
-    puts " GUESSES   =>   FEEDBACK "
-    puts " _ _ _ _   =>   _ _ _ _  " * @guesses-@turn
+    puts " GUESSES   =>    FEEDBACK "
+    #puts " _ _ _ _   =>   _ _ _ _  " * @guesses - @turn
+    #binding.pry
     (0..@turn).each do |turn|
-      puts" #{@combo_container[turn][0]} #{@combo_container[turn][1]} #{@combo_container[turn][2]} #{@combo_container[turn][3]}   =>   #{@feedback_container[turn][0]} #{@feedback_container[turn][1]} #{@feedback_container[turn][2]} #{@feedback_container[turn][3]} "
+      #binding.pry
+      puts " #{@combo_container[turn][0]} #{@combo_container[turn][1]} #{@combo_container[turn][2]} #{@combo_container[turn][3]}   =>   #{@feedback_container[turn][0]} #{@feedback_container[turn][1]} #{@feedback_container[turn][2]} #{@feedback_container[turn][3]} "
     end
   end 
   
@@ -153,15 +185,17 @@ class Game
       @board.guesses = gets.chomp.to_i # ~> NoMethodError: undefined method `chomp' for nil:NilClass
       puts"please input a number(ie. 1)" if @board.guesses == 0
     end
+    (0..@board.guesses-1).each{|x| @board.feedback_container[x] = Array.new(4, " _ ")}
+    (0..@board.guesses-1).each{|x| @board.combo_container[x] = Array.new(4, " _ ")}
   end
       
   def game   
     start
     for i in 0..@board.guesses-1
-      @board.turn(i)
+      @board.turn = i
       @board.update_board
       @board.accept_mystery_code if i == 0
-      puts "Ok, for the mastermind to crack the code!" if i == 0
+      puts "Ok, NOW! for the mastermind to crack the code!" if i == 0
       @board.accept_guesses(i)
       @board.feedback(i)
       @board.update_board
@@ -178,15 +212,4 @@ class Game
 end
 
 Game.new.game
-
-
-
-
-
-
-
-
-
-
-
 
