@@ -29,71 +29,109 @@ class Players
   def guess
   end
   
-$#end
-$#
-$#class combos
-$#  attr_accessor :code
-$#  
-$#  def initialize(entry)
-$#    :code = Array.new(entry)
-$#  end
-$#
-$#  def feedback_from_guess(guess)
-$#    feedback = Array.new
-$#    guess.each do |letter| 
-$#      if letter ==   
-$#  end
-$#end
+end
+
+class Combos
+  attr_accessor :code
+  
+  def initialize
+    @code = Array.new(4, " _ ")
+  end
+
+  #def feedback_from_guess(guess)
+  #  feedback = Array.new
+  #  guess.each do |letter| 
+  #    if letter ==   
+  #end
+end
 
 class Board
-  def initialize
-    :feedback_container = Array.new
-    :combo_container = Array.new
-    #(1..@guesses).each{\x\ @feedback_container = feedback_from_guess.new}
-    #(1..@guesses).each{\x\ @guess_container = combos.new}
+  def initialize    
+    @mystery_code = Combos.new
+    @turn = 0
+    @guesses = Fixnum
+    @feedback_container = Array.new
+    @combo_container = Array.new
+    (0..@guesses-1).each{|x| @feedback_container[x] = Combos.new}
+    (0..@guesses-1).each{|x| @combo_container[x] = Combos.new}
     #Array of arrays
     #iterate up to number of guesses that was taken from start of game, default 12
-    :mystery_code = Combos.new
-    :turn = 0
   end
+  
+  def intake
+    #split = Array.new
+    string = ""
+    begin
+      puts "please input a combination in the following format (ie. 'ABCD')"
+      string = gets.chomp.upcase
+      puts "That was not an appropriate input, please try again" unless string =~ /[a-fA-F]{4}/             
+    end until string =~ /[a-fA-F]{4}/
+    combination = string.split(//)    
+  end
+    
+  def feedback(i)
+    difference = @mystery_code - @combo_container[i] #if you get back 4 objects, that means none were right, if you get back 1 object, that means 3 was right
+    number_of_correct_letters = 4 - difference.size 
+    number_of_black = 0
+    (0..3).each do |number|
+      number_of_black += 1 if @mystery_code[number] == @combo_container[i][number]
+    end
+    number_of_white = number_of_correct_letters - number_of_black
+    feedback = Array.new
+    number_of_black.times do
+      feedback << " B "
+    end
+    number_of_white.times do
+      feedback << " W "
+    end
+    @feedback_container[i] = feedback 
+  end  
     
   def update_board
     system 'clear'
     puts " GUESSES   =>   FEEDBACK "
-    puts " _ _ _ _   =>   _ _ _ _  ##{@turn+1}" * Game.@guesses
+    puts " _ _ _ _   =>   _ _ _ _  " * @guesses-@turn
+    (0..@turn).each do |turn|
+      puts" #{@combo_container[turn][0]} #{@combo_container[turn][1]} #{@combo_container[turn][2]} #{@combo_container[turn][3]}   =>   #{@feedback_container[turn][0]} #{@feedback_container[turn][1]} #{@feedback_container[turn][2]} #{@feedback_container[turn][3]} "
+    end
   end 
   
-  def accept_guesses
-    begin
-      puts "please input a guess!"
-      split = Array.new
-      guess = gets.chomp.upcase!
-      if guess.size != 4 
-        puts "you must put in 4 letters from A-F"
-        retry
-      if guess.each_char{|letter| true unless letter =~ (/[ABCDEF]/)}
-        puts "All your guesses must be from A-F"
-        retry
-      else
-        split = guess.split(//)
-        @combo_container[@turn] = split
-      end
-    end        
+  def accept_guesses(i)
+    puts "It is round #{i+1}"
+    puts"Time to guess! What do you think the combination is?"
+    @combo_container[i] = intake #i is the round the game is currently in, which is chosen at the start (default 12)
+    #begin
+    #  puts "please input a guess!"
+    #  split = Array.new
+    #  guess = gets.chomp.upcase!
+    #  if guess.size != 4 
+    #    puts "you must put in 4 letters from A-F"
+    #    retry
+    #  if guess.each_char{|letter| true unless letter =~ (/[ABCDEF]/)}
+    #    puts "All your guesses must be from A-F"
+    #    retry
+    #  else
+    #    split = guess.split(//)
+    #    @combo_container[@turn] = split
+    #  end
+    #end        
   end
   
   def accept_mystery_code
-    holder = String.new 
-    i = 0    
     puts "Please input the mystery code!"
-    until i >3
-      until @mystery_code[i] =~ (/[ABCDEF]/)
-        puts "Which letter(A-F) would you like to put in position#{i+1}?"
-        holder = gets.chomp.upcase! # => NoMethodError: undefined method `chomp' for nil:NilClass
-        @mystery_code[i]= holder[0]
-        puts "please put a letter from A-F" unless @mystery_code[i] =~ (/[ABCDEF]/)    
-      end
-      i += 1 if @mystery_code[i] != 'x'
-    end
+    @mystery_code = intake
+    #holder = String.new 
+    #i = 0    
+    #puts "Please input the mystery code!"
+    #until i >3
+    #  until @mystery_code[i] =~ (/[ABCDEF]/)
+    #    puts "Which letter(A-F) would you like to put in position#{i+1}?"
+    #    holder = gets.chomp.upcase! # => NoMethodError: undefined method `chomp' for nil:NilClass
+    #    @mystery_code[i]= holder[0]
+    #    puts "please put a letter from A-F" unless @mystery_code[i] =~ (/[ABCDEF]/)    
+    #  end
+    #  i += 1 if @mystery_code[i] != 'x'
+    #end
   end
 end
 
@@ -101,7 +139,6 @@ class Game
   attr_accessor :rounds, :guesses
   def initialize
     @rounds = 0
-    @guesses = 0
     @board = Board.new
   end
   
@@ -111,18 +148,26 @@ class Game
       @rounds = gets.chomp.to_i # ~> NoMethodError: undefined method `chomp' for nil:NilClass
       puts"please input a number(ie. 1)" if @rounds == 0
     end
-    until @guesses > 0 # => false
+    until @board.guesses > 0 # => false
       puts "How many guesses would you like in this game?" 
-      @guesses = gets.chomp.to_i # ~> NoMethodError: undefined method `chomp' for nil:NilClass
-      puts"please input a number(ie. 1)" if @guesses == 0
+      @board.guesses = gets.chomp.to_i # ~> NoMethodError: undefined method `chomp' for nil:NilClass
+      puts"please input a number(ie. 1)" if @board.guesses == 0
     end
   end
       
   def game   
     start
-    @board.accept_myster_code
-    
-    
+    for i in 0..@board.guesses-1
+      @board.turn(i)
+      @board.update_board
+      @board.accept_mystery_code if i == 0
+      puts "Ok, for the mastermind to crack the code!" if i == 0
+      @board.accept_guesses(i)
+      @board.feedback(i)
+      @board.update_board
+      puts " It is the end of round #{i+1} of the guesses, have you cracked the code?"
+      
+    end  
   end
     
   #loop through # of rounds(set at start of the game)
@@ -132,7 +177,11 @@ class Game
     #end
 end
 
-  
+Game.new.game
+
+
+
+
 
 
 
