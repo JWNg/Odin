@@ -61,8 +61,6 @@ class Board
     #temp_mystery_code = Array.new
     temp_guess = @combo_container[i].dup
     temp_mystery_code = @mystery_code.dup
-    puts temp_guess
-    puts temp_mystery_code
     (0..3).each do |position|
       if temp_guess[position] == temp_mystery_code[position] 
         if temp_guess[position] == 'X'
@@ -76,7 +74,7 @@ class Board
       #  next
       end
     end
-    binding.pry
+    #binding.pry
     white_markers = 0
     temp_guess.each do|guess|
       if temp_mystery_code.include?(guess)
@@ -119,12 +117,12 @@ class Board
     
   def update_board
     system 'clear'
-    puts " GUESSES   =>    FEEDBACK "
+    puts "   GUESSES   =>   FEEDBACK "
     #puts " _ _ _ _   =>   _ _ _ _  " * @guesses - @turn
     #binding.pry
     (0..@turn).each do |turn|
       #binding.pry
-      puts " #{@combo_container[turn][0]} #{@combo_container[turn][1]} #{@combo_container[turn][2]} #{@combo_container[turn][3]}   =>   #{@feedback_container[turn][0]} #{@feedback_container[turn][1]} #{@feedback_container[turn][2]} #{@feedback_container[turn][3]} "
+      puts "#{@combo_container[turn][0]}#{@combo_container[turn][1]}#{@combo_container[turn][2]}#{@combo_container[turn][3]} => #{@feedback_container[turn][0]}#{@feedback_container[turn][1]}#{@feedback_container[turn][2]}#{@feedback_container[turn][3]}"
     end
   end 
   
@@ -170,16 +168,22 @@ end
 class Game
   attr_accessor :rounds, :guesses
   def initialize
-    @rounds = 0
+    #@rounds = 0
     @board = Board.new
   end
   
-  def start
-    until @rounds > 0 # => false
-      puts "Welcome to Mastermind, How many rounds would you like in this game?" 
-      @rounds = gets.chomp.to_i # ~> NoMethodError: undefined method `chomp' for nil:NilClass
-      puts"please input a number(ie. 1)" if @rounds == 0
+  def win_check(i)
+    if @board.feedback(i) == [" B ", " B ", " B ", " B "]
+      return true
     end
+  end
+  
+  def start
+    #until @rounds > 0 # => false
+    #  puts "Welcome to Mastermind, How many rounds would you like in this game?" 
+    #  @rounds = gets.chomp.to_i # ~> NoMethodError: undefined method `chomp' for nil:NilClass
+    #  puts"please input a number(ie. 1)" if @rounds == 0
+    #end
     until @board.guesses > 0 # => false
       puts "How many guesses would you like in this game?" 
       @board.guesses = gets.chomp.to_i # ~> NoMethodError: undefined method `chomp' for nil:NilClass
@@ -195,13 +199,21 @@ class Game
       @board.turn = i
       @board.update_board
       @board.accept_mystery_code if i == 0
+      system 'clear'
       puts "Ok, NOW! for the mastermind to crack the code!" if i == 0
       @board.accept_guesses(i)
       @board.feedback(i)
-      @board.update_board
-      puts " It is the end of round #{i+1} of the guesses, have you cracked the code?"
-      
-    end  
+      @board.update_board      
+      if win_check(i)
+        puts "Congrats you are the Codemaster!" 
+        return
+      elsif i == @board.guesses-1
+        puts "Ahhh better luck next time"
+        return
+      end
+      puts " It is the end of round #{i+1} of the guesses, have you cracked the code?"      
+    end 
+     
   end
     
   #loop through # of rounds(set at start of the game)
@@ -212,4 +224,11 @@ class Game
 end
 
 Game.new.game
+
+
+
+
+
+
+
 
