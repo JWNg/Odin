@@ -1,21 +1,3 @@
-#game logic:
-#start game, intake user name? potentially to save several games?
-#intake number of acceptable guesses
-#
-#menu option to save or guess word invoked by :s & :g respectively
-#-provide option to guess the mystery word at anytime through the above options
-#
-#loop through:
-#-reveal mystery_words letters via _ _ _ *underscores && words must be 5+ letters
-#-intake guess
-#-check if letter is in mystery word:
-##=> if letter is in mystery word, reveal letter
-##=> else add to list of letters already guessed
-#-update list of letters guessed and those within mystery word
-#
-#things to remember:
-# no repeat letters, reject input/guess
-# 
 require 'pry'
 require 'yaml'
 
@@ -27,17 +9,17 @@ class Mystery_word
     @hidden = create_hidden_string
   end
   
-  def number_of_lines
-    count = 0
-    File.foreach("5desk.txt").inject(0){|c, line| count+1}
-    count
-  end
+ #def number_of_lines
+ #  count = 0
+ #  File.foreach("5desk.txt").inject(0){|c, line| count+1}
+ #  count
+ #end
   
   def get_mystery_word
     mystery_word = String.new
-    content = File.open("5desk.txt", "r")
-    eligible_words = content.split.select {|word| word.length <5 && word.length >12}
-    mystery_word = eligible_words[rand(eligible_words.length)]  
+    content = File.open("5desk.txt", "r"){|f| f.read}
+    eligible_words = content.split.select {|w| w.length.between?(5,12)}
+    mystery_word = eligible_words[rand(eligible_words.length)].upcase  
   end
   
   def acceptable_mystery_word?(word)
@@ -108,7 +90,6 @@ class Game
   def solve
     puts "Please input your answer"
     answer = gets.chomp.upcase
-    binding.pry
     if answer == @mystery_word.word
       puts "***Congrats You figured it out!***"
       @game_end = true
@@ -123,7 +104,7 @@ class Game
     input = gets.chomp    
   end
   
-  def input
+  def input(i)
     update_display(i)
     puts "Please guess a letter"
     input = gets.chomp.upcase
@@ -159,7 +140,8 @@ class Game
     for i in 0..@mystery_word.word.length-1 do
       index << i if @mystery_word.word[i] == @guess
     end
-    @mystery_word.hidden_update(index, @guess)         
+    @mystery_word.hidden_update(index, @guess)
+    return true if !index.empty?         
   end
    
   def update_display(i)
@@ -190,15 +172,17 @@ class Game
     input_name_and_max if @player_name.empty?
     puts BANNER
     puts ""
-    puts ""  
-    for i in 1..@max_guesses do
+    puts ""
+    i = 1
+    while i < @max_guesses+1 do
       input(i)  #updates @guess 
       #check_prior_guesses  # updates @prior_guesses
       break if @game_end == true
-      update_mystery_word# @mystery_word.hidden is updated?
+      i -= 1 if update_mystery_word# @mystery_word.hidden is updated?
       revealed_check  
       update_display(i)
-      break if @game_end == true    
+      break if @game_end == true
+      i += 1
     end
   end  
 end
