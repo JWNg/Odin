@@ -14,29 +14,22 @@ class Tree
   def crawl(number, node)   
    exit = false
    position = node
-   #binding.pry
    return position if position.left_child.nil? == true && position.value >= number || position.right_child.nil? == true && position.value < number
    while exit == false do
-     #binding.pry
-     if position.value <= number && position.right_child.nil? == true  
-       #binding.pry     
+     if position.value <= number && position.right_child.nil? == true   
        exit = true
        return position
-     elsif position.value > number && position.left_child.nil? == true 
-       #binding.pry      
+     elsif position.value > number && position.left_child.nil? == true  
        exit = true
        return position
      elsif position.value <= number && position.right_child.value.class == Fixnum
-       #binding.pry
        position = position.right_child
      elsif position.value > number && position.left_child.value.class == Fixnum
-       #binding.pry
        position = position.left_child
      end       
    end
    position
-   #binding.pry
-  end 
+  end   
   
   def assess(number, node)
     if node.value <= number
@@ -50,13 +43,80 @@ class Tree
   
   def add_node(number)
     position = crawl(number, @top)
-    #binding.pry
     new_node = assess(number, position)
     new_node.value = number
-    #binding.pry
-  end  
+  end 
+end
+
+array = [13 , 5, 34, 3, 8, 21, 55, 1, 144, 0, 2, 89, 233]
+
+def build_tree(array)
+  list = array.dup
+  tree = Tree.new array[0]
+  list.each do |number|
+    tree.add_node(number) unless number == array[0]
+  end
+  tree  
+end
+
+def test_build_tree
+  p "doing test for test_build_tree method"
+  p '______________________________________'
+  p build_tree_test.top.left_child.left_child.left_child.value # => 
+  p build_tree_test.top.left_child.right_child.value # => 
+  p build_tree_test.top.right_child.right_child.value # => 
+  p build_tree_test.top.right_child.right_child.right_child.value # => 
+  p '______________________________________'
+end
+
+def create_script
+  test = Tree.new(13)
+  test.add_node(34) # => 
+  test.add_node(21) # => 
+  test.add_node(5) # => 
+  test.add_node(3) # => 
+  test.add_node(8) # => 
+  test.add_node(1) # => 
+  test.add_node(2) # => 
+  test.add_node(21) # => 
+  test.add_node(55) # => 
+  test.add_node(144) # => 
+  test.add_node(89) # => 
+  test.add_node(233) # => 
   
-  def build_tree
-    tree
+  p test.top.left_child.left_child.left_child.value
+  p test.top.left_child.right_child.value # => 
+  p test.top.right_child.right_child.value # => 
+  p test.top.right_child.right_child.right_child.value
+  test
+end
+
+def breadth_first_search(tree, figure)
+  completed = Array.new #values that have been checked/reached  
+  #top node, left child (add to queue), right child (add to cue), left-childs' left and right (both add to cue)
+  #until queue is empty
+  queue = [tree.top.dup]
+  until queue.empty? == true do
+    binding.pry
+    if queue[0].value == figure
+      return queue[0]
+      binding.pry
+      queue.shift
+      
+    else 
+      queue << queue[0].left_child unless queue[0].nil? == true
+      queue << queue[0].right_child unless queue[0].nil? == true
+      binding.pry
+      queue.shift
+    end
   end  
 end
+
+build_tree_test = build_tree(array)
+test = create_script
+binding.pry
+puts "doing breadth first search"
+p '______________________________________'
+p breadth_first_search(build_tree_test, 233)
+#p breadth_first_search(test, 233)
+p '______________________________________'
