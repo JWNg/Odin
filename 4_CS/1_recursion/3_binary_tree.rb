@@ -97,26 +97,41 @@ def breadth_first_search(tree, figure)
   #until queue is empty
   queue = [tree.top.dup]
   until queue.empty? == true do
-    binding.pry
-    if queue[0].value == figure
-      return queue[0]
-      binding.pry
+    #binding.pry
+    if queue[0] == nil
       queue.shift
-      
+    elsif queue[0].value == figure 
+      return queue[0]
+      #binding.pry
+      queue.shift      
     else 
-      queue << queue[0].left_child unless queue[0].nil? == true
+      queue << queue[0].left_child unless queue[0].nil? == true 
       queue << queue[0].right_child unless queue[0].nil? == true
-      binding.pry
+      #binding.pry
       queue.shift
     end
   end  
 end
 
+def depth_first_search(tree, figure)
+  result = Array.new #visited items
+  stack = Array.new
+  
+end
+
 build_tree_test = build_tree(array)
 test = create_script
-binding.pry
+#binding.pry
 puts "doing breadth first search"
 p '______________________________________'
-p breadth_first_search(build_tree_test, 233)
-#p breadth_first_search(test, 233)
+p breadth_first_search(build_tree_test, 455)
+p breadth_first_search(test, 455)
+p '______________________________________'
+p "doing depth first search without recursion"
+p '______________________________________'
+
+p '______________________________________'
+p "doing depth first search using recursion"
+p '______________________________________'
+
 p '______________________________________'
