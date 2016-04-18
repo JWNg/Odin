@@ -136,8 +136,14 @@ def depth_first_search(tree, figure)
   end 
 end
 
-def dfs_rec(tree, figure)
-  
+def dfs_rec(tree_node, figure)
+  return nil if tree_node.nil?
+  return tree_node if tree_node.value == figure
+  left = dfs_rec(tree_node.left_child, figure)  
+  right = dfs_rec(tree_node.right_child, figure)
+  return left unless left.nil?
+  return right unless right.nil?
+  nil
 end
 
 build_tree_test = build_tree(array)
@@ -152,13 +158,14 @@ p '______________________________________'
 p '______________________________________'
 p "doing depth first search without recursion"
 p '______________________________________'
-p depth_first_search(test, 233)
+p depth_first_search(test, 8)
 p '______________________________________'
 p '______________________________________'
 p '______________________________________'
 p "doing depth first search using recursion"
 p '______________________________________'
-
+p dfs_rec(test.top, 8)
+p dfs_rec(build_tree_test.top, 8)
 p '______________________________________'
 p '______________________________________'
 p '______________________________________'
