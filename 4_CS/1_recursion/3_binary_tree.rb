@@ -114,8 +114,29 @@ def breadth_first_search(tree, figure)
 end
 
 def depth_first_search(tree, figure)
-  result = Array.new #visited items
-  stack = Array.new
+  set = tree.top.dup
+  stack = [set]
+  result = [set]
+  while stack.empty? == false do
+    if stack[-1]== nil 
+      stack.pop
+    elsif stack[-1].value == figure #found the figure
+      return stack[-1]
+    elsif stack[-1] != figure #did not find the figure
+      if result.include?(stack[-1].left_child) == false #move to the lower number first
+        result << stack[-1].left_child
+        stack << stack[-1].left_child
+      elsif result.include?(stack[-1].right_child) == false #move to the second option, right child
+        result << stack[-1].right_child
+        stack << stack[-1].right_child
+      else
+        stack.pop
+      end      
+    end      
+  end 
+end
+
+def dfs_rec(tree, figure)
   
 end
 
@@ -127,11 +148,17 @@ p '______________________________________'
 p breadth_first_search(build_tree_test, 455)
 p breadth_first_search(test, 455)
 p '______________________________________'
+p '______________________________________'
+p '______________________________________'
 p "doing depth first search without recursion"
 p '______________________________________'
-
+p depth_first_search(test, 233)
+p '______________________________________'
+p '______________________________________'
 p '______________________________________'
 p "doing depth first search using recursion"
 p '______________________________________'
 
+p '______________________________________'
+p '______________________________________'
 p '______________________________________'
