@@ -15,11 +15,9 @@ class Path_engine
   
   attr_reader :destination
   
-  def initialize(starting_position, ending_position)
-    @start = Square.new(starting_position)
-    @end = Square.new(ending_position)
-    @levels = Hash.new
-    @levels[0] = [Square.new(starting_position)]
+  def initialize   
+    @levels = Hash.new    
+    @path = []
   end
     
   def duplicate_move?(move, next_move)
@@ -54,11 +52,40 @@ class Path_engine
     until next_level(i) == []
       @levels[i] = next_level(i)
       i += 1      
-    end
-    binding.pry     
+    end    
   end
+  
+  def find_end_destination
+    for i in 0..@levels.size do
+      @levels[i].each {|square| return square if square.x == @end.x && square.y == @end.y}
+    end    
+  end
+  
+  def find_path_taken
+    destination = find_end_destination
+    path = [[find_end_destination.x, find_end_destination.y]]
+    begin
+      path << [destination.parent.x, destination.parent.y]
+      destination = destination.parent
+    end until destination.parent == nil
+    @path = path.reverse
+  end
+  
+  def knight_moves(starting_position, ending_position)
+    @start = Square.new(starting_position)
+    @end = Square.new(ending_position)
+    @levels[0] = [Square.new(starting_position)]
+    
+    #@start.x, @start.y = start[0], start[1]
+    #@end.x, @end.y = end_state[0], end_state[1]
+    build_tree
+    path = find_path_taken
+    p "You made it in #{path.size-2}, starting with:"
+    path.each{|array| p array}
+  end
+  
 end
 
-p = Path_engine.new([1,1], [2,2])
-p.build_tree
+p = Path_engine.new #([1,1], [6,5])
+p.knight_moves([1,1],[1,2])
 
